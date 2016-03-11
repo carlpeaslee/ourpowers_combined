@@ -11,6 +11,8 @@ $('document').ready( function () {
 
   $('.time').on('click', estimateTime);
 
+  $('.add-employee').on('click', getStaff)
+
 });
 
 var possibleCompanies = ["acme", "general", "industries", "solutions", "electrical", "horses", "enterprises", "intrepid", "empire"];
@@ -131,32 +133,54 @@ function getStaff() {
     url: "/staff",
     success: function(data){
       assignStaff(data);
+      appendDom(data);
       estimateTime();
+
     }
   });
+
+}
+
+function appendDom(staff){
+    $('.staff-list').append('<div class="employee"></div>');
+
+    var $col = $('.staff-list').children().last();
+    $col.append('<span class="employee-name">' + staff.name + '</span>, ');
+    $col.append('<span class="skillset">Skillset: ' + staff.skill + '</span>,   ');
+    $col.append('<span class="scrum-pts"> Scrum Points: ' + staff.totalScrumPts + '</span>');
+
+    $('.add-employee').removeClass('hidden');
 }
 
 function estimateTime() {
-  var feEstimate =  fePtsTotal / sumStaffPts(feStaff) ;
+  var feEstimate =  fePtsTotal / sumStaffPts(feStaff);
+  console.log(feEstimate);
+
   var csEstimate = csPtsTotal / sumStaffPts(csStaff);
+  console.log(csEstimate);
+
   var ssEstimate = ssPtsTotal / sumStaffPts(ssStaff);
+  console.log(ssPtsTotal);
 
   if (feEstimate > csEstimate && feEstimate > ssEstimate) {
-    timeEstimate = feEestimate;
+    timeEstimate = feEstimate;
   } else if (csEstimate > feEstimate && csEstimate > ssEstimate ) {
     timeEstimate = csEstimate;
   } else if (ssEstimate > feEstimate && ssEstimate > csEstimate) {
     timeEstimate = ssEstimate;
   }
-console.log(timeEstimate);
   //end by appending timeEstimate to the dom
-  $('.time-estimate').text(timeEstimate);
+  $('.time-estimate').text(timeEstimate.toFixed(2));
 }
 
 function sumStaffPts(array) {
+  var departmentCapacity = 0;
   for (var i = 0; i < array.length; i++) {
-    var departmentCapacity;
     departmentCapacity += array[i].totalScrumPts;
   }
-  return departmentCapacity;
+  return departmentCapacity
 }
+
+// function addOneEmployee(){
+//   getStaff();
+// }
